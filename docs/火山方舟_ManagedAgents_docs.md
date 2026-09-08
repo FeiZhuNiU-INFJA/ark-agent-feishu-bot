@@ -205,14 +205,14 @@ Managed Agents 按照 Agent 运行过程中实际消耗的 Tokens、Agent 运行
 
 ## 1. 获取并配置 API Key
 
-1. 获取 API Key：访问 [API Key 管理](https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey)，创建你的 API Key。
+1. 获取 API Key：访问 [API Key 管理](https://ark.volcengine.com/region:cn-beijing/apiKey)，创建你的 API Key。
 
 2. 配置环境变量：在终端中运行下面命令（替换 `your_api_key_here` 为你的方舟 API Key），配置 API Key 到环境变量。
 
-配置持久化环境变量方法参见 [环境变量配置指南](https://www.volcengine.com/docs/82379/1820161)。
+配置持久化环境变量方法参见 [环境变量配置指南](https://ark.volcengine.com/region:cn-beijing/docs/82379/1820161?lang=zh)。
 
 <Tabs>
-<Tab zoneid="CesaXIjFeG" title="macOS">
+<Tab zoneid="iLDH6le012" title="macOS">
 <TabTitle>macOS</TabTitle>
 
 ```Bash
@@ -220,7 +220,7 @@ export ARK_API_KEY="your_api_key_here"
 ```
 
 </Tab>
-<Tab zoneid="EkycLxFUfp" title="Linux">
+<Tab zoneid="Lzjhb4pfSy" title="Linux">
 <TabTitle>Linux</TabTitle>
 
 ```Bash
@@ -228,7 +228,7 @@ export ARK_API_KEY="your_api_key_here"
 ```
 
 </Tab>
-<Tab zoneid="OGLPOj2e3C" title="Windows_CMD">
+<Tab zoneid="FGNVGuogIS" title="Windows_CMD">
 <TabTitle>Windows_CMD</TabTitle>
 
 ```Bash
@@ -236,7 +236,7 @@ setx ARK_API_KEY "your_api_key_here"
 ```
 
 </Tab>
-<Tab zoneid="XKXhipXxKE" title="Windows_PowerShell">
+<Tab zoneid="dYFO7YhogD" title="Windows_PowerShell">
 <TabTitle>Windows_PowerShell</TabTitle>
 
 ```PowerShell
@@ -250,13 +250,13 @@ $env:ARK_API_KEY = "your_api_key_here"
 
 ## 2. 开通 Managed Agents 服务
 
-访问 [开通管理页面](https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement)，切换到 **Managed Agents** 页签开通服务。
+访问 [开通管理页面](https://ark.volcengine.com/region:cn-beijing/openManagement)，切换到 **Managed Agents** 页签开通服务。
 
 <span id="enable_model_service"></span>
 
 ## 3. 开通模型服务
 
-访问 [开通管理页面](https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement) 开通模型服务。
+访问 [开通管理页面](https://ark.volcengine.com/region:cn-beijing/openManagement) 开通模型服务。
 
 <span id="create_agent"></span>
 
@@ -524,30 +524,303 @@ done < <(
 )
 ```
 
+<span id=".c2RrLeWujOaVtOekuuS-iw=="></span>
+
+## SDK 完整示例
+
+<Tabs>
+<Tab zoneid="UXpKAp8QiQ" title="Python">
+<TabTitle>Python</TabTitle>
+
+```Python
+import os
+import time
+
+from arkruntime import Ark
+
+
+client = Ark(
+    api_key=os.environ["ARK_API_KEY"],
+    base_url="https://ark.cn-beijing.volces.com/api/v3",
+)
+suffix = str(int(time.time()))
+
+agent = client.agents.create(
+    name=f"quick-start-agent-{suffix}",
+    model={"id": "doubao-seed-2-1-pro-260628"},
+    system="你是一个高效的编程助手，擅长代码编写和问题排查。",
+    tools=[{"type": "agent_toolset_20260701"}],
+)
+environment = client.environments.create(
+    name=f"quick-start-env-{suffix}",
+    config={
+        "type": "cloud",
+        "networking": {"type": "unrestricted"},
+    },
+)
+session = client.sessions.create(
+    agent=agent.id,
+    environment_id=environment.id,
+    title="Quickstart session",
+)
+
+try:
+    client.sessions.events.send(
+        session.id,
+        events=[
+            {
+                "type": "user.message",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "用 Python 输出前 20 个斐波那契数。",
+                    }
+                ],
+            }
+        ],
+    )
+
+    for event in client.sessions.events.stream(session.id):
+        print(event)
+        if event.type in {"session.status_idle", "session.status_terminated"}:
+            break
+finally:
+    client.sessions.delete(session.id)
+    client.environments.delete(environment.id)
+    client.agents.delete(agent.id)
+```
+
+</Tab>
+<Tab zoneid="kI8it31ATP" title="Go">
+<TabTitle>Go</TabTitle>
+
+```Go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    "time"
+
+    "github.com/volcengine/ark-runtime-go/arkruntime"
+    agentmodel "github.com/volcengine/ark-runtime-go/arkruntime/model/agent"
+    envmodel "github.com/volcengine/ark-runtime-go/arkruntime/model/environment"
+    sessionmodel "github.com/volcengine/ark-runtime-go/arkruntime/model/session"
+)
+
+func main() {
+    ctx := context.Background()
+    client := arkruntime.NewClientWithApiKey(
+        os.Getenv("ARK_API_KEY"),
+        arkruntime.WithBaseUrl("https://ark.cn-beijing.volces.com/api/v3"),
+    )
+    suffix := fmt.Sprint(time.Now().Unix())
+
+    agent, err := client.CreateAgent(ctx, &agentmodel.CreateAgentRequest{
+        Name:   "quick-start-agent-" + suffix,
+        Model:  agentmodel.ModelConfig{ID: "doubao-seed-2-1-pro-260628"},
+        System: agentmodel.NewOptString("你是一个高效的编程助手。"),
+        Tools:  []agentmodel.ToolItem{{Type: "agent_toolset_20260701"}},
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    environment, err := client.CreateEnvironment(ctx, &envmodel.CreateEnvironmentRequest{
+        Name: "quick-start-env-" + suffix,
+        Config: envmodel.NewOptEnvConfig(envmodel.EnvConfig{
+            Type: envmodel.EnvConfigTypeCloud,
+            Networking: envmodel.NewOptNetworkingConfig(envmodel.NetworkingConfig{
+                Type: envmodel.NetworkingTypeUnrestricted,
+            }),
+        }),
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    session, err := client.CreateSession(ctx, &sessionmodel.CreateSessionRequest{
+        Agent:         sessionmodel.NewStringAgentIdentifier(agent.ID),
+        EnvironmentID: sessionmodel.NewOptString(environment.ID),
+        Title:         sessionmodel.NewOptString("Quickstart session"),
+    })
+    if err != nil {
+        panic(err)
+    }
+    defer client.DeleteAgent(ctx, agent.ID)
+    defer client.DeleteEnvironment(ctx, environment.ID)
+    defer client.DeleteSession(ctx, session.ID)
+
+    content := sessionmodel.ManagedAgentsMessageContentBlock{
+        OneOf: sessionmodel.NewManagedAgentsTextBlockManagedAgentsMessageContentBlockSum(
+            sessionmodel.ManagedAgentsTextBlock{Text: "用 Python 输出前 20 个斐波那契数。"},
+        ),
+    }
+    event := sessionmodel.ManagedAgentsEventParams{
+        OneOf: sessionmodel.NewManagedAgentsUserMessageEventParamsManagedAgentsEventParamsSum(
+            sessionmodel.ManagedAgentsUserMessageEventParams{
+                Content: []sessionmodel.ManagedAgentsMessageContentBlock{content},
+            },
+        ),
+    }
+    _, err = client.SendSessionEvents(ctx, session.ID, &sessionmodel.SendSessionEventsRequest{
+        Events: []sessionmodel.ManagedAgentsEventParams{event},
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    stream, err := client.StreamSessionEvents(ctx, session.ID)
+    if err != nil {
+        panic(err)
+    }
+    defer stream.Close()
+    for stream.Next() {
+        frame := stream.Event()
+        fmt.Printf("%s: %s\n", frame.Type, frame.RawPayload)
+        if frame.Type == "session.status_idle" || frame.Type == "session.status_terminated" {
+            break
+        }
+    }
+    if err := stream.Err(); err != nil {
+        panic(err)
+    }
+}
+```
+
+</Tab>
+<Tab zoneid="Vm6gGxwrdx" title="Java">
+<TabTitle>Java</TabTitle>
+
+```Java
+package com.ark.sample;
+
+import com.volcengine.ark.runtime.models.agent.Agent;
+import com.volcengine.ark.runtime.models.agent.CreateAgentRequest;
+import com.volcengine.ark.runtime.models.agent.ModelConfig;
+import com.volcengine.ark.runtime.models.agent.ToolItem;
+import com.volcengine.ark.runtime.models.environment.CreateEnvironmentRequest;
+import com.volcengine.ark.runtime.models.environment.EnvConfig;
+import com.volcengine.ark.runtime.models.environment.EnvConfigType;
+import com.volcengine.ark.runtime.models.environment.Environment;
+import com.volcengine.ark.runtime.models.environment.NetworkingConfig;
+import com.volcengine.ark.runtime.models.environment.NetworkingType;
+import com.volcengine.ark.runtime.models.session.AgentIdentifier;
+import com.volcengine.ark.runtime.models.session.CreateSessionRequest;
+import com.volcengine.ark.runtime.models.session.ManagedAgentsMessageContentBlock;
+import com.volcengine.ark.runtime.models.session.ManagedAgentsTextBlock;
+import com.volcengine.ark.runtime.models.session.ManagedAgentsUserMessageEventParams;
+import com.volcengine.ark.runtime.models.session.SendSessionEventsRequest;
+import com.volcengine.ark.runtime.models.session.Session;
+import com.volcengine.ark.runtime.service.ArkService;
+import okhttp3.ResponseBody;
+import okio.BufferedSource;
+import retrofit2.Response;
+
+import java.util.Arrays;
+
+public class ManagedAgentsQuickStart {
+    public static void main(String[] args) throws Exception {
+        ArkService service = ArkService.builder()
+                .apiKey(System.getenv("ARK_API_KEY"))
+                .baseUrl("https://ark.cn-beijing.volces.com/api/v3")
+                .build();
+        String suffix = String.valueOf(System.currentTimeMillis());
+
+        Agent agent = service.createAgent(
+                CreateAgentRequest.builder()
+                        .name("quick-start-agent-" + suffix)
+                        .model(ModelConfig.builder().id("doubao-seed-2-1-pro-260628").build())
+                        .system("你是一个高效的编程助手。")
+                        .tools(Arrays.asList(ToolItem.builder().type("agent_toolset_20260701").build()))
+                        .build());
+        Environment environment = service.createEnvironment(
+                CreateEnvironmentRequest.builder()
+                        .name("quick-start-env-" + suffix)
+                        .config(EnvConfig.builder()
+                                .type(EnvConfigType.CLOUD)
+                                .networking(NetworkingConfig.builder()
+                                        .type(NetworkingType.UNRESTRICTED)
+                                        .build())
+                                .build())
+                        .build());
+        Session session = service.createSession(
+                CreateSessionRequest.builder()
+                        .agent(AgentIdentifier.ofString(agent.getId()))
+                        .environmentId(environment.getId())
+                        .title("Quickstart session")
+                        .build());
+
+        try {
+            ManagedAgentsTextBlock text = ManagedAgentsTextBlock.builder()
+                    .text("用 Python 输出前 20 个斐波那契数。")
+                    .build();
+            ManagedAgentsUserMessageEventParams event =
+                    ManagedAgentsUserMessageEventParams.builder()
+                            .content(Arrays.<ManagedAgentsMessageContentBlock>asList(text))
+                            .build();
+            service.sendSessionEvents(
+                    session.getId(),
+                    SendSessionEventsRequest.builder()
+                            .events(Arrays.asList(event))
+                            .build());
+
+            Response<ResponseBody> response =
+                    service.streamSessionEvents(session.getId()).execute();
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new IllegalStateException("Stream request failed: " + response.code());
+            }
+            try (ResponseBody body = response.body()) {
+                BufferedSource source = body.source();
+                String line;
+                while ((line = source.readUtf8Line()) != null) {
+                    if (line.startsWith("data:")) {
+                        System.out.println(line.substring(5).trim());
+                    }
+                    if (line.contains("session.status_idle")
+                            || line.contains("session.status_terminated")) {
+                        break;
+                    }
+                }
+            }
+        } finally {
+            service.deleteSession(session.getId());
+            service.deleteEnvironment(environment.getId());
+            service.deleteAgent(agent.getId());
+            service.shutdownExecutor();
+        }
+    }
+}
+```
+
+</Tab>
+</Tabs>
+
 <span id="runtime_notes"></span>
 
 # 运行说明
 
 当您发送用户事件时，方舟托管 Agent 会：
 
-1. **配置沙箱** ：您的环境配置决定了沙箱的构建方式。
+1. **配置沙箱**：您的环境配置决定了沙箱的构建方式。
 
-2. **运行Agent循环** ：方舟根据您的消息确定要使用哪些工具。
+2. **运行Agent循环**：方舟根据您的消息确定要使用哪些工具。
 
-3. **执行工具** ：启动沙箱，在沙箱内运行文件写入、bash 命令和其他工具调用。
+3. **执行工具**：启动沙箱，在沙箱内运行文件写入、bash 命令和其他工具调用。
 
-4. **流式传输事件** ：您会在Agent工作时收到实时更新。
+4. **流式传输事件**：您会在Agent工作时收到实时更新。
 
-5. **进入空闲状态** ：当Agent没有更多任务要执行时，会发出 `session.status_idle` 事件。
+5. **进入空闲状态**：当Agent没有更多任务要执行时，会发出 `session.status_idle` 事件。
 
 <span id="next_steps"></span>
 
 # 后续步骤
 
 <columns>
-<columnsItem zoneid="AE0NTJT4sw">
+<columnsItem zoneid="A774ZUaxTy">
 
-<card mode="container" href="/docs/82379/2553716" >
+<card mode="container" href="https://ark.volcengine.com/region:cn-beijing/docs/82379/2553716?lang=zh" >
 
 **定义 Agent**
 
@@ -555,7 +828,7 @@ done < <(
 
 </card>
 
-<card mode="container" href="/docs/82379/2553721" >
+<card mode="container" href="https://ark.volcengine.com/region:cn-beijing/docs/82379/2553721?lang=zh" >
 
 **配置环境**
 
@@ -564,9 +837,9 @@ done < <(
 </card>
 
 </columnsItem>
-<columnsItem zoneid="TbT5iEFdqM">
+<columnsItem zoneid="iQUmguoRFp">
 
-<card mode="container" href="/docs/82379/2553719" >
+<card mode="container" href="https://ark.volcengine.com/region:cn-beijing/docs/82379/2553719?lang=zh" >
 
 **Agent tools**
 
@@ -574,7 +847,7 @@ done < <(
 
 </card>
 
-<card mode="container" href="/docs/82379/2553725" >
+<card mode="container" href="https://ark.volcengine.com/region:cn-beijing/docs/82379/2553725?lang=zh" >
 
 **Session 事件流**
 
