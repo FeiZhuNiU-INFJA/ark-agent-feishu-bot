@@ -184,6 +184,35 @@ def prettier_format(text: str) -> tuple[str, bool]:
         os.unlink(tmp_path)
 
 
+# --- 完整性自检 -------------------------------------------------------------
+
+
+def _count_markers(text: str) -> dict[str, int]:
+    """统计易被格式化破坏的关键结构标记数量。"""
+    return {
+        "代码围栏 ```": text.count("```"),
+        "<Tabs>": text.count("<Tabs>"),
+        "<TabTitle>": text.count("<TabTitle>"),
+    }
+
+
+def check_integrity(before: str, after: str) -> list[str]:
+    """比较格式化前后的关键标记数量，返回告警信息列表（为空表示无损）。
+
+    Prettier 处理 <Tabs> 等自定义 HTML 块时，历史上出现过吞掉内部代码围栏、
+    导致多语言 SDK 示例整段丢失的情况。这里做一次数量核对，任何减少都报警。
+    """
+    warnings: list[str] = []
+    b, a = _count_markers(before), _count_markers(after)
+    for name in b:
+        if a[name] < b[name]:
+            warnings.append(
+                f"格式化后「{name}」数量减少：{b[name]} -> {a[name]}"
+                "（疑似代码块/Tab 内容被吞，请检查）"
+            )
+    return warnings
+
+
 # --- 主流程 -----------------------------------------------------------------
 
 
@@ -219,9 +248,13 @@ def main(argv: list[str] | None = None) -> int:
     text = assemble(docs, args.start, args.end)
 
     if not args.no_format:
+        raw = text
         text, ok = prettier_format(text)
         if not ok:
             print("[warn] 未进行 Prettier 格式化（缺少 npx 或执行失败），输出为拼接原文。")
+        else:
+            for w in check_integrity(raw, text):
+                print(f"[warn] {w}")
 
     if args.dry_run:
         print(f"\n[dry-run] 已生成 {len(text)} 字符，未写入。目标路径：{args.out}")

@@ -32,6 +32,10 @@ description: 同步火山方舟（Volcengine Ark）文档中心的一段连续�
   （对齐既有合集的对外规范域名）；只有「来源」行保留 `docs.volcengine.com`。
 - 用 Prettier（`--parser markdown --prose-wrap preserve`）统一表格对齐、锚点空行、
   CJK 强调间距，保证幂等、只反映真实内容变化，不产生格式抖动。
+- 多语言代码示例用 `<Tabs>/<Tab>/<TabTitle>` 自定义 HTML 标签包裹（如「SDK 完整示例」
+  的 Python/Go/Java 三个 tab）。这类内容也在 `MDContent` 里，会被完整保留。脚本在
+  格式化后做一次**完整性自检**：核对 ` ``` ` / `<Tabs>` / `<TabTitle>` 数量未减少，
+  若被吞会打印 `[warn]`，避免静默产出残缺文件。
 - 幂等验证：线上未变更的页面重复运行后 diff 近似为空。
 
 ## 用法
