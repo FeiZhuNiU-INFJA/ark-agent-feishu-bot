@@ -29,8 +29,9 @@ arkagent = "arkagent.cli:main"
 customer-a-mock-mcp = "mock_mcp.__main__:main"
 
 [tool.setuptools]
+package-dir = {"" = "scenarios/feishu-bot"}
 packages = ["arkagent", "mock_mcp"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests"]
+testpaths = ["scenarios/feishu-bot/tests"]
