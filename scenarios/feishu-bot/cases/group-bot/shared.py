@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-# 让 `python examples/group_bot/demo_x.py` 能直接 import 到主包 arkagent（无需安装）。
+# 让 `python scenarios/feishu-bot/cases/group-bot/demo_x.py` 能直接 import 到主包 arkagent（无需安装）。
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))

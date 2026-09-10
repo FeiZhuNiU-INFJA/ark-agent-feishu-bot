@@ -12,7 +12,7 @@
 运行：
   set -a && source ~/.arkagent/config.env && set +a   # 或自行 export 相关变量
   export GROUP_BOT_AGENT_ID=<用 create_group_agent.py 建出的 agent id>
-  python examples/group_bot/demo_a_serial.py
+  python scenarios/feishu-bot/cases/group-bot/demo_a_serial.py
 """
 from __future__ import annotations
 

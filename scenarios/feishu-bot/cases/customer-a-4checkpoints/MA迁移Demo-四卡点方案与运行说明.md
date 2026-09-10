@@ -15,7 +15,7 @@
 | **C** 岗位信息注入    | 岗位信息注入 system prompt 层，缓存 1 天，Session 不变 | Gateway 维护`(open_id, roleInfo, refreshedAt)` 缓存（24h TTL）；仅首轮 / 缓存 miss 后首访挂一次 `system.message`                    | C-1 客户侧 / C-2 MA 已支持                                                                  |
 | **D** 跨 Session 记忆 | 岗位调动 / 换场景后记忆延续                            | 每用户专属 Memory Store，创建 Session 时经`resources` 挂到 `/mnt/memory/`（只读）；写入用 `/remember` 显式指令由应用侧调 API 写回 | 只读挂载/API 增删改 MA 已支持；「记什么、何时写」客户侧适配；对话自动抽取属 MA 未来 Feature |
 
-> **卡点 B 的字段来源说明**：会话级环境变量注入未在方舟官方文档正文明写，但已由 MA 平台负责人口头确认「创建 Session 接口能传环境变量」且线下跑通。本 Demo 照此实现（见 [ark.py](../arkagent/ark.py) 的 `create_session`）。若平台后续改为标准字段，改回对应字段即可。
+> **卡点 B 的字段来源说明**：会话级环境变量注入未在方舟官方文档正文明写，但已由 MA 平台负责人口头确认「创建 Session 接口能传环境变量」且线下跑通。本 Demo 照此实现（见 [ark.py](../../arkagent/ark.py) 的 `create_session`）。若平台后续改为标准字段，改回对应字段即可。
 >
 > **卡点 A 是安全降级，不是 客户A 私有签名**：仅用 `static_bearer` + 白名单演示鉴权链路，勿向客户表述为「已实现 客户A 私有签名」。
 
@@ -117,7 +117,7 @@ cpolar http 8765
 
 > **避坑一 · 地址末尾不要带斜杠**：填 `…/mcp`，**不要** `…/mcp/`。带尾斜杠会触发 307 重定向，方舟握手探测不跟随重定向 → `init` 报 424 失败。
 >
-> **避坑二 · 421 Misdirected Request**：FastMCP 默认开启 DNS rebinding 保护，只放行本机 Host，经穿透用外部域名访问会被判非法 Host 返回 421。本 Demo 的 mock 已在 [server.py](../mock_mcp/server.py) 的 `build_server()` 关闭该保护（demo 场景），无需额外配置；若你换用别的 MCP，注意这一点。
+> **避坑二 · 421 Misdirected Request**：FastMCP 默认开启 DNS rebinding 保护，只放行本机 Host，经穿透用外部域名访问会被判非法 Host 返回 421。本 Demo 的 mock 已在 [server.py](../../mock_mcp/server.py) 的 `build_server()` 关闭该保护（demo 场景），无需额外配置；若你换用别的 MCP，注意这一点。
 
 > cpolar 免费版每次重启隧道公网域名会变；换了地址需重新 `arkagent init`，或改 `~/.arkagent/config.env` 里的 `MCP_SERVER_URL` 后 `arkagent update-agent`。
 
@@ -147,7 +147,7 @@ arkagent doctor
 
 ### 日常迭代：只更新 Agent（不重扫码）
 
-改了 Agent 的 system prompt 或工具配置（[init.py](../arkagent/init.py) 的 `build_customer_a_agent_config`）后，**不需要**重跑 `init` 重新扫码建应用——那样只会堆出一个新 Bot。直接：
+改了 Agent 的 system prompt 或工具配置（[init.py](../../arkagent/init.py) 的 `build_customer_a_agent_config`）后，**不需要**重跑 `init` 重新扫码建应用——那样只会堆出一个新 Bot。直接：
 
 ```bash
 arkagent update-agent
@@ -190,7 +190,7 @@ arkagent run
 查一下我的销售线索和本月业绩
 ```
 
-> **真机必做**：你的真实飞书 open_id 默认不在 mock 白名单里，首次会被拒（回复「不在白名单」）。此时看 `arkagent run` 或 mock 日志里打印的你的 open_id（形如 `ou_...`），把它连同一份数据加进 [mock_mcp/data.py](../mock_mcp/data.py) 的 `USER_DATA`，**重启 mock**（纯本地改动，无需重跑 init）后再问，即可拿到真实数据。
+> **真机必做**：你的真实飞书 open_id 默认不在 mock 白名单里，首次会被拒（回复「不在白名单」）。此时看 `arkagent run` 或 mock 日志里打印的你的 open_id（形如 `ou_...`），把它连同一份数据加进 [mock_mcp/data.py](../../mock_mcp/data.py) 的 `USER_DATA`，**重启 mock**（纯本地改动，无需重跑 init）后再问，即可拿到真实数据。
 >
 > 要直观展示「不同人拿到不同数据」，用**两个飞书账号**分别发同一句，看到各自的线索/KPI 不同即证明隔离。mock 内置 `ou-demo-manager`（销售经理）与 `ou-demo-sales`（销售顾问）两份不同数据可作参照。
 
@@ -214,7 +214,7 @@ arkagent run
 
 ## 配置项（`~/.arkagent/config.env`）
 
-`init` 自动写入；也可参考 [.env.example](../.env.example)。
+`init` 自动写入；也可参考 [.env.example](../../.env.example)。
 
 | Key                                                          | 说明                                                                                |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |

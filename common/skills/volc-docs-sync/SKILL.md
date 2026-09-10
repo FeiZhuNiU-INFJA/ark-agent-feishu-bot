@@ -1,6 +1,6 @@
 ---
 name: volc-docs-sync
-description: 同步火山方舟（Volcengine Ark）文档中心的一段连续页面为单个 Markdown 合集文件。通过文档中心 getDocDetail 接口抓取每页自带的「复制 Markdown」原文，做链接归一化并用 Prettier 统一格式，幂等生成/更新合集。当用户要求更新 docs/火山方舟_ManagedAgents_docs.md，或按 DocumentID 区间从 docs.volcengine.com 抓取拼接文档合集时使用。
+description: 同步火山方舟（Volcengine Ark）文档中心的一段连续页面为单个 Markdown 合集文件。通过文档中心 getDocDetail 接口抓取每页自带的「复制 Markdown」原文，做链接归一化并用 Prettier 统一格式，幂等生成/更新合集。当用户要求更新 common/docs/火山方舟_ManagedAgents_docs.md，或按 DocumentID 区间从 docs.volcengine.com 抓取拼接文档合集时使用。
 ---
 
 # volc-docs-sync：火山方舟文档合集同步
@@ -8,12 +8,12 @@ description: 同步火山方舟（Volcengine Ark）文档中心的一段连续�
 把火山方舟文档中心（`docs.volcengine.com/docs/{library}/{doc_id}`）一段
 **连续 DocumentID 区间**的页面，抓取拼接成一个 Markdown 合集文件。
 
-本仓库默认目标：`docs/火山方舟_ManagedAgents_docs.md`
+本仓库默认目标：`common/docs/火山方舟_ManagedAgents_docs.md`
 （Managed Agents 文档，DocumentID `2553713..2553730`，共 18 页）。
 
 ## 何时使用
 
-- 用户说「更新 `docs/火山方舟_ManagedAgents_docs.md`」/「同步方舟 MA 文档」。
+- 用户说「更新 `common/docs/火山方舟_ManagedAgents_docs.md`」/「同步方舟 MA 文档」。
 - 用户给出 `docs.volcengine.com/.../{start}..{end}` 形式的区间，要求抓取拼接。
 - 需要按 DocumentID 区间从火山方舟文档中心导出「复制 Markdown」原文合集。
 
@@ -41,23 +41,23 @@ description: 同步火山方舟（Volcengine Ark）文档中心的一段连续�
 ## 用法
 
 ```bash
-# 默认：更新本仓库的方舟 MA 合集（2553713..2553730 -> docs/火山方舟_ManagedAgents_docs.md）
-python3 skills/volc-docs-sync/update_docs.py
+# 默认：更新本仓库的方舟 MA 合集（2553713..2553730 -> common/docs/火山方舟_ManagedAgents_docs.md）
+python3 common/skills/volc-docs-sync/update_docs.py
 
 # 只抓取并打印诊断（每页标题 / MDContent 长度 / 最近更新时间），不写文件
-python3 skills/volc-docs-sync/update_docs.py --dry-run
+python3 common/skills/volc-docs-sync/update_docs.py --dry-run
 
 # 自定义区间与输出路径（复用到其它文档合集）
-python3 skills/volc-docs-sync/update_docs.py \
+python3 common/skills/volc-docs-sync/update_docs.py \
     --start 2553713 --end 2553730 \
-    --out docs/火山方舟_ManagedAgents_docs.md
+    --out common/docs/火山方舟_ManagedAgents_docs.md
 
 # 跳过 Prettier（环境无 npx 时；输出为拼接原文，可能有格式抖动）
-python3 skills/volc-docs-sync/update_docs.py --no-format
+python3 common/skills/volc-docs-sync/update_docs.py --no-format
 ```
 
 参数：`--start/--end`（闭区间 DocumentID）、`--out`（输出路径，默认基于脚本位置
-自适配到仓库 `docs/`）、`--no-format`、`--dry-run`、`--sleep`（请求间隔秒）。
+自适配到 `common/docs/`）、`--no-format`、`--dry-run`、`--sleep`（请求间隔秒）。
 
 ## 依赖
 
@@ -69,9 +69,9 @@ python3 skills/volc-docs-sync/update_docs.py --no-format
 
 ```bash
 # 结构完整性：以下三项都应为区间页数（默认 18）
-grep -cE '<a id="doc-[0-9]+"></a>' docs/火山方舟_ManagedAgents_docs.md
-grep -cE '^\- \[.*\]\(#doc-[0-9]+\)'  docs/火山方舟_ManagedAgents_docs.md
-grep -c   '来源：\[https'             docs/火山方舟_ManagedAgents_docs.md
+grep -cE '<a id="doc-[0-9]+"></a>' common/docs/火山方舟_ManagedAgents_docs.md
+grep -cE '^\- \[.*\]\(#doc-[0-9]+\)'  common/docs/火山方舟_ManagedAgents_docs.md
+grep -c   '来源：\[https'             common/docs/火山方舟_ManagedAgents_docs.md
 # 正文不应残留 docs.volcengine.com/docs（应为 0）
-grep '来源：' -v docs/火山方舟_ManagedAgents_docs.md | grep -c 'docs.volcengine.com/docs'
+grep '来源：' -v common/docs/火山方舟_ManagedAgents_docs.md | grep -c 'docs.volcengine.com/docs'
 ```

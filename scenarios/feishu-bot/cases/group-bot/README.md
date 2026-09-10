@@ -32,7 +32,7 @@
 | 体验 | 后到者需排队（给「正在处理」回执） | 更接近 Claude Tag 的异步接力，但并发问不同事易糅在一起 |
 | 适合 | 群里不同人**各问各的**、要各自清晰答复 | **同一件事多人接力补充** |
 
-依据：`docs/火山方舟_ManagedAgents_docs.md` 的「运行中继续发送消息」（L3183+）、
+依据：`common/docs/火山方舟_ManagedAgents_docs.md` 的「运行中继续发送消息」（L3183+）、
 事件 `processed_at`（L2893）、合并语义（L3193）、`RuntimeBusy`（L3195）。
 
 ## 运行
@@ -46,12 +46,12 @@
 set -a && source ~/.arkagent/config.env && set +a
 
 # 2) 创建一个 Bot-only 的群聊 Agent（与四卡点 Agent 相互独立），拿到 agent id
-python examples/group_bot/create_group_agent.py
+python scenarios/feishu-bot/cases/group-bot/create_group_agent.py
 export GROUP_BOT_AGENT_ID=<上一步打印的 agent id>
 
 # 3) 二选一启动
-python examples/group_bot/demo_a_serial.py         # 方案 A：串行
-python examples/group_bot/demo_c_native_queue.py   # 方案 C：方舟原生队列
+python scenarios/feishu-bot/cases/group-bot/demo_a_serial.py         # 方案 A：串行
+python scenarios/feishu-bot/cases/group-bot/demo_c_native_queue.py   # 方案 C：方舟原生队列
 ```
 
 把 bot 拉进一个群，多人 @ 它：

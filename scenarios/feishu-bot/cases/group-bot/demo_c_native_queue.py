@@ -1,6 +1,6 @@
 """Demo C：方舟原生队列（运行中直发 + 吸收/合并）——更接近 Claude Tag 的异步协作。
 
-思路（对应方案 C，依据 docs/火山方舟_ManagedAgents_docs.md「运行中继续发送消息」L3183+）：
+思路（对应方案 C，依据 common/docs/火山方舟_ManagedAgents_docs.md「运行中继续发送消息」L3183+）：
   - 群里所有人 @ bot 共享同一个方舟 Session。
   - **不在客户端排队**：消息一到就 send_message 直接打进 Session，哪怕它还在 running。
     方舟把它写入「运行中待处理队列」，等 Agent 执行到「可调度边界」（模型请求结束 /
@@ -20,7 +20,7 @@
 运行：
   set -a && source ~/.arkagent/config.env && set +a
   export GROUP_BOT_AGENT_ID=<用 create_group_agent.py 建出的 agent id>
-  python examples/group_bot/demo_c_native_queue.py
+  python scenarios/feishu-bot/cases/group-bot/demo_c_native_queue.py
 """
 from __future__ import annotations
 

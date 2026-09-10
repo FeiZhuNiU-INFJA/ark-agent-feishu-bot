@@ -2,7 +2,7 @@
 
 > 面向：交付 / 二次开发同学。本文是 MA 平台的**静态视角**——有哪些组件、各是什么、谁包含谁、谁绑定谁、何时创建 / 绑定 / 销毁。
 > 想看「一条消息怎么流过这些组件」的**动态视角**，见 [四卡点数据流转说明](./MA迁移Demo-四卡点数据流转说明.md)。
-> 每个组件先给**官方通用定义**（依据 [火山方舟 ManagedAgents 官方文档](./火山方舟_ManagedAgents_docs.md)），再附**本 demo 怎么用 + 代码链接**。
+> 每个组件先给**官方通用定义**（依据 [火山方舟 ManagedAgents 官方文档](../../../../common/docs/火山方舟_ManagedAgents_docs.md)），再附**本 demo 怎么用 + 代码链接**。
 > 说明：文中结构图 / 关系图用 Mermaid 编写，在支持 Mermaid 的渲染器（Trae/IDE 预览、GitHub）中可直接看图；粘贴到飞书文档时图不渲染，请以图下方的文字表格为准。
 
 ---
@@ -54,12 +54,12 @@ graph TB
 - Agent 有**版本**。更新 Agent 会产生新版本；运行中的 Session **不能**改 Agent 配置，要调整能力得发布新版本再新建 Session（官方 Session 状态机一节明确"本期不支持运行时修改 Agent 配置 / tools / mcp_servers"）。
 - Agent 定义里声明的 `mcp_servers[]` **只有 URL，没有 token**——token 在 Vault 里（见 1.3）。
 
-**本 demo 怎么用**：init 时创建一个 Agent，配置由 [build_customer_a_agent_config](../arkagent/init.py#L59) 生成：`agent_toolset_20260701`（保留 bash/read/glob/grep，关掉 web_search/web_fetch）+ `mcp_toolset`（`permission_policy.type=always_allow`）+ `mcp_servers`（指向 mock 的 URL）+ system prompt [CUSTOMER_A_AGENT_SYSTEM](../arkagent/init.py#L25)。换 MCP 地址时通过 [update_agent](../arkagent/ark.py#L112) 发布新版本。
+**本 demo 怎么用**：init 时创建一个 Agent，配置由 [build_customer_a_agent_config](../../arkagent/init.py#L59) 生成：`agent_toolset_20260701`（保留 bash/read/glob/grep，关掉 web_search/web_fetch）+ `mcp_toolset`（`permission_policy.type=always_allow`）+ `mcp_servers`（指向 mock 的 URL）+ system prompt [CUSTOMER_A_AGENT_SYSTEM](../../arkagent/init.py#L25)。换 MCP 地址时通过 [update_agent](../../arkagent/ark.py#L112) 发布新版本。
 
 | | |
 | --- | --- |
-| 创建 | [create_agent](../arkagent/ark.py#L103)（init 阶段，[init.py:114](../arkagent/init.py#L114)） |
-| 更新 | [update_agent](../arkagent/ark.py#L112)（`update-agent` 命令换地址 / 改配置时） |
+| 创建 | [create_agent](../../arkagent/ark.py#L103)（init 阶段，[init.py:114](../../arkagent/init.py#L114)） |
+| 更新 | [update_agent](../../arkagent/ark.py#L112)（`update-agent` 命令换地址 / 改配置时） |
 | 存哪 | 方舟侧；ID 写进 config.env 的 `ARK_AGENT_ID` |
 
 ### 1.2 Environment（云环境 / 沙箱配置）
@@ -73,11 +73,11 @@ graph TB
 - 只有**没有 Session 引用**时才能删除。
 - 网络策略：`networking.type=unrestricted` 完全放行（MCP 可用）；`limited` 才看 allow 列表。**本 demo 用 unrestricted**（否则 mock MCP 连不通）。
 
-**本 demo 怎么用**：init 时创建一个 Environment，名字含 Agent ID + Feishu App ID（避免误复用旧应用的环境），见 [init.py:135-148](../arkagent/init.py#L135-L148)。
+**本 demo 怎么用**：init 时创建一个 Environment，名字含 Agent ID + Feishu App ID（避免误复用旧应用的环境），见 [init.py:135-148](../../arkagent/init.py#L135-L148)。
 
 | | |
 | --- | --- |
-| 创建 | [create_environment](../arkagent/ark.py#L135)（init 阶段） |
+| 创建 | [create_environment](../../arkagent/ark.py#L135)（init 阶段） |
 | 存哪 | 方舟侧；ID 写进 config.env 的 `ARK_ENVIRONMENT_ID` |
 
 ### 1.3 Vault（凭据金库）与 Credential（凭据）
@@ -101,13 +101,13 @@ Vault (display_name = customer-a-ma-<agentid>)
 - **运行时按 `mcp_server_url` 匹配**：Agent 要连某 MCP URL 时，在本 Session 挂的 Vault 里找 `mcp_server_url` 相等的凭据取 token；**没有匹配的就匿名连接**（服务器要鉴权就报错 → 这就是"换址后 401、日志显示 `auth=<缺失>`"的成因）。多个 Vault 都有匹配时第一个优先。
 - 凭据在 Session 期间**周期性重新解析**，轮换 / 删除 / 刷新会传播到运行中的 Session，无需重启。
 
-**本 demo 怎么用**：init 时建一个 Vault + 一条 `static_bearer` 凭据（token = `demo-bearer-token`），见 [init.py:118-133](../arkagent/init.py#L118-L133)。换址由 [update-agent --mcp-url](../arkagent/cli.py#L176-L230) 编排：**先用新址建新凭据（触发探测）→ 更新 Agent → 写回 .env → 按 URL 删掉所有非新址的旧凭据**（不按名字匹配，兼容历史异名凭据）。
+**本 demo 怎么用**：init 时建一个 Vault + 一条 `static_bearer` 凭据（token = `demo-bearer-token`），见 [init.py:118-133](../../arkagent/init.py#L118-L133)。换址由 [update-agent --mcp-url](../../arkagent/cli.py#L176-L230) 编排：**先用新址建新凭据（触发探测）→ 更新 Agent → 写回 .env → 按 URL 删掉所有非新址的旧凭据**（不按名字匹配，兼容历史异名凭据）。
 
 | | |
 | --- | --- |
-| 创建 Vault | [create_vault](../arkagent/ark.py#L159)（init 阶段） |
-| 创建凭据 | [create_static_bearer_credential](../arkagent/ark.py#L188)（创建即握手探测） |
-| 删除凭据 | [delete_credential](../arkagent/ark.py#L200)（换址清理旧凭据） |
+| 创建 Vault | [create_vault](../../arkagent/ark.py#L159)（init 阶段） |
+| 创建凭据 | [create_static_bearer_credential](../../arkagent/ark.py#L188)（创建即握手探测） |
+| 删除凭据 | [delete_credential](../../arkagent/ark.py#L200)（换址清理旧凭据） |
 | 存哪 | 方舟侧；Vault ID 写进 config.env 的 `ARK_VAULT_ID`；token 同时写进 `MCP_STATIC_BEARER` |
 
 > `MCP_STATIC_BEARER` 这一个值"一处配两处用"（mock 服务端校验 + 方舟客户端凭据），详见 [数据流转说明 §0.5](./MA迁移Demo-四卡点数据流转说明.md#05-关键机制深挖--凭证与-openid-的存储与传递)。
@@ -133,12 +133,12 @@ Session 创建时引用的四类东西：
 - 删除 Session 不可逆（`running` 状态需先中断回 `idle` 才能删）。
 - `resources` 里的 **Memory Store 只能创建时挂载**，运行中不能增减。
 
-**本 demo 怎么用**：每条会话首次消息时建 Session，见 [_create_session](../arkagent/gateway.py#L174-L187)——一次性把 B（env_overrides）、C（不在这，走 system_message）、D（resources）、A（vault_ids）需要的东西都注入。会话身份用四元组 `(tenant_key, chat_id, thread_id, user_open_id)` 隔离，session_id 存在应用侧 SQLite（见 1.6）。`/new` 只重置当前会话的 session 映射，下条消息重新建 Session。
+**本 demo 怎么用**：每条会话首次消息时建 Session，见 [_create_session](../../arkagent/gateway.py#L174-L187)——一次性把 B（env_overrides）、C（不在这，走 system_message）、D（resources）、A（vault_ids）需要的东西都注入。会话身份用四元组 `(tenant_key, chat_id, thread_id, user_open_id)` 隔离，session_id 存在应用侧 SQLite（见 1.6）。`/new` 只重置当前会话的 session 映射，下条消息重新建 Session。
 
 | | |
 | --- | --- |
-| 创建 | [create_session](../arkagent/ark.py#L221)（每条会话首次消息，[gateway.py:181](../arkagent/gateway.py#L181)） |
-| 驱动 | [run](../arkagent/ark.py#L269)（发 user.message + 收 SSE 事件流） |
+| 创建 | [create_session](../../arkagent/ark.py#L221)（每条会话首次消息，[gateway.py:181](../../arkagent/gateway.py#L181)） |
+| 驱动 | [run](../../arkagent/ark.py#L269)（发 user.message + 收 SSE 事件流） |
 | 存哪 | 方舟侧；session_id 映射存应用侧 SQLite `conversations` 表 |
 
 ### 1.5 Memory Store（跨 Session 长期记忆）
@@ -152,20 +152,20 @@ Session 创建时引用的四类东西：
 - 使用 Memory Store 要求 Agent 启用了 Agent Toolset（靠文件工具读取）。
 
 **本 demo 怎么用（卡点 D）**：
-- **每 open_id 一个专属 Store**（懒创建：首次建 Session 或 `/remember` 时创建，预置一条 `/profile/basic.md` 画像），见 [ensure_user_store](../arkagent/memory.py#L33-L52)。
-- 写入走 `/remember` 显式指令 → 应用侧调 API 写一条时间戳命名的 note，见 [remember](../arkagent/memory.py#L54-L64) 和 [_handle_remember_command](../arkagent/gateway.py#L189-L209)。
-- 建 Session 时把该用户 Store（可选 + 团队 Store）拼进 `resources`，见 [build_session_resources](../arkagent/memory.py#L78-L89)。
+- **每 open_id 一个专属 Store**（懒创建：首次建 Session 或 `/remember` 时创建，预置一条 `/profile/basic.md` 画像），见 [ensure_user_store](../../arkagent/memory.py#L33-L52)。
+- 写入走 `/remember` 显式指令 → 应用侧调 API 写一条时间戳命名的 note，见 [remember](../../arkagent/memory.py#L54-L64) 和 [_handle_remember_command](../../arkagent/gateway.py#L189-L209)。
+- 建 Session 时把该用户 Store（可选 + 团队 Store）拼进 `resources`，见 [build_session_resources](../../arkagent/memory.py#L78-L89)。
 - 岗位调动 / `/new` **不新建 Store**，只是新开 Session 挂同一个 Store → 天然记得历史。
 
 | | |
 | --- | --- |
-| 创建 Store | [create_memory_store](../arkagent/ark.py#L209)（懒创建） |
-| 写记忆 | [create_memory](../arkagent/ark.py#L213)（应用侧写，Agent 只读） |
+| 创建 Store | [create_memory_store](../../arkagent/ark.py#L209)（懒创建） |
+| 写记忆 | [create_memory](../../arkagent/ark.py#L213)（应用侧写，Agent 只读） |
 | 存哪 | 方舟侧；open_id→store_id 映射存应用侧 SQLite `memory_stores` 表 |
 
 ### 1.6 应用侧存储（不是 MA 组件，但关系图里少不了）
 
-MA 本身不替你记"哪条飞书会话对应哪个 Session、哪个用户对应哪个 Store"这类**映射**，这些落在本 demo 的 SQLite（[GatewayStore](../arkagent/store.py)）里：
+MA 本身不替你记"哪条飞书会话对应哪个 Session、哪个用户对应哪个 Store"这类**映射**，这些落在本 demo 的 SQLite（[GatewayStore](../../arkagent/store.py)）里：
 
 | 表 | 主键 | 存什么 | 服务于 |
 | --- | --- | --- | --- |
@@ -217,15 +217,15 @@ graph LR
 
 | 阶段 | 建了什么 | 代码 |
 | --- | --- | --- |
-| **init（一次性）** | Agent、Environment、Vault + Credential、Feishu App | [init.py `run_guided_init`](../arkagent/init.py#L98-L175) |
-| **首次触发（懒创建）** | 每 open_id 一个 Memory Store（首次建 Session 或首次 `/remember`） | [ensure_user_store](../arkagent/memory.py#L33-L52) |
-| **每条会话首次消息** | Session（绑齐 A/B/C/D 所需） | [_create_session](../arkagent/gateway.py#L174-L187) |
+| **init（一次性）** | Agent、Environment、Vault + Credential、Feishu App | [init.py `run_guided_init`](../../arkagent/init.py#L98-L175) |
+| **首次触发（懒创建）** | 每 open_id 一个 Memory Store（首次建 Session 或首次 `/remember`） | [ensure_user_store](../../arkagent/memory.py#L33-L52) |
+| **每条会话首次消息** | Session（绑齐 A/B/C/D 所需） | [_create_session](../../arkagent/gateway.py#L174-L187) |
 
 ### 3.2 更新 / 变更时机
 
 | 场景 | 影响的组件 | 怎么做 |
 | --- | --- | --- |
-| 换 MCP 地址（cpolar 重启） | Agent（新版本）+ Vault（删旧凭据建新）+ config.env | [update-agent --mcp-url](../arkagent/cli.py#L176-L230) 一条命令编排 |
+| 换 MCP 地址（cpolar 重启） | Agent（新版本）+ Vault（删旧凭据建新）+ config.env | [update-agent --mcp-url](../../arkagent/cli.py#L176-L230) 一条命令编排 |
 | 改 Agent 能力 / prompt | Agent（新版本） | 发布新版本，已有 Session 不受影响，新 Session 才用新版 |
 | 岗位调动（卡点 C） | 无 MA 组件变更 | 只更新应用侧 `role_cache`，下轮对话经 system_message 声明 |
 | 记住一条信息（卡点 D） | Memory Store（+1 条 memory） | `/remember` → 应用侧写 API |
@@ -254,7 +254,7 @@ graph LR
 
 ## 附：术语与官方出处
 
-| 组件 | 官方文档小节（见 [火山方舟_ManagedAgents_docs.md](./火山方舟_ManagedAgents_docs.md)） |
+| 组件 | 官方文档小节（见 [火山方舟_ManagedAgents_docs.md](../../../../common/docs/火山方舟_ManagedAgents_docs.md)） |
 | --- | --- |
 | Agent | 「创建 Agent」「Agent 定义字段」「更新 Agent 与版本」 |
 | Environment | 「配置云环境」「环境生命周期」「管理环境」「云沙箱参考」 |

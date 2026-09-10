@@ -5,7 +5,7 @@
 
 运行：
   set -a && source ~/.arkagent/config.env && set +a   # 需要 ARK_API_KEY[/ARK_BASE_URL]
-  python examples/group_bot/create_group_agent.py
+  python scenarios/feishu-bot/cases/group-bot/create_group_agent.py
 """
 from __future__ import annotations
 

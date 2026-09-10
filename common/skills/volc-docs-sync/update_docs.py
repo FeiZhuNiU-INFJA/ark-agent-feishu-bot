@@ -12,7 +12,7 @@ Markdown 合集文件，并用 Prettier 统一格式（表格对齐 / 锚点空�
 
     # 自定义 ID 区间与输出路径
     python3 update_docs.py --start 2553713 --end 2553730 \\
-        --out ../../docs/火山方舟_ManagedAgents_docs.md
+        --out ../docs/火山方舟_ManagedAgents_docs.md
 
     # 只拉取、打印诊断，不写文件
     python3 update_docs.py --dry-run
@@ -44,7 +44,7 @@ LIBRARY_ID = 82379
 DEFAULT_START = 2553713
 DEFAULT_END = 2553730  # 闭区间
 
-# 脚本相对仓库根目录的默认输出（skills/volc-docs-sync/ -> 仓库根 -> docs/...）。
+# 脚本相对 common/ 目录的默认输出（common/skills/volc-docs-sync/ -> common/ -> docs/...）。
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _REPO_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, "..", ".."))
 DEFAULT_OUT = os.path.join(_REPO_ROOT, "docs", "火山方舟_ManagedAgents_docs.md")
