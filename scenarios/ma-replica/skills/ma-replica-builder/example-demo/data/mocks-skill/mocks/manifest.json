@@ -1,0 +1,131 @@
+{
+  "api|get_authed_columns|objs=customer,interaction_log,ticket": {
+    "file": "mocks/api_call__api__get_authed_columns__objs-customer-interaction_log-ticket__83de3557.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "get_authed_columns",
+      "params": {
+        "object_code_list": [
+          "ticket",
+          "customer",
+          "interaction_log"
+        ]
+      }
+    },
+    "is_error": false
+  },
+  "api|kb_lookup|q=4e753b4a87": {
+    "file": "mocks/api_call__api__kb_lookup__q-4e753b4a87__61fa788b.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "kb_lookup",
+      "params": {
+        "query": "退款政策"
+      }
+    },
+    "is_error": false
+  },
+  "api|query_object|obj=customer|where=customer_id=C-77": {
+    "file": "mocks/api_call__api__query_object__obj-customer__where-customer_id-C-77__bb33bc0c.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "customer",
+        "where": {
+          "columnCode": "customer_id",
+          "value": "C-77"
+        }
+      }
+    },
+    "is_error": false
+  },
+  "api|query_object|obj=interaction_log|where=ticket_id=T-1003": {
+    "file": "mocks/api_call__api__query_object__obj-interaction_log__where-ticket_id-T-1003__5043a796.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "interaction_log",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1003"
+        }
+      }
+    },
+    "is_error": true
+  },
+  "api|query_object|obj=ticket|where=ticket_id=T-1001": {
+    "file": "mocks/api_call__api__query_object__obj-ticket__where-ticket_id-T-1001__f4dcb6df.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "ticket",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1001"
+        }
+      }
+    },
+    "is_error": false
+  },
+  "api|query_object|obj=ticket|where=ticket_id=T-1002": {
+    "file": "mocks/api_call__api__query_object__obj-ticket__where-ticket_id-T-1002__24d09498.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "ticket",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1002"
+        }
+      }
+    },
+    "is_error": false
+  },
+  "api|query_object|obj=ticket|where=ticket_id=T-1003": {
+    "file": "mocks/api_call__api__query_object__obj-ticket__where-ticket_id-T-1003__daf8e628.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "ticket",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1003"
+        }
+      }
+    },
+    "is_error": false
+  },
+  "api|recommend_macro|tag=billing": {
+    "file": "mocks/api_call__api__recommend_macro__tag-billing__ebaacb1d.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "recommend_macro",
+      "params": {
+        "recommend_tag": "billing"
+      }
+    },
+    "is_error": false
+  },
+  "api|recommend_macro|tag=refund": {
+    "file": "mocks/api_call__api__recommend_macro__tag-refund__7c74e02d.txt",
+    "method": "api_call",
+    "args": {
+      "api_code": "recommend_macro",
+      "params": {
+        "recommend_tag": "refund"
+      }
+    },
+    "is_error": false
+  },
+  "current_time": {
+    "file": "mocks/current_time__current_time__017a97a4.txt",
+    "method": "current_time",
+    "args": {},
+    "is_error": false
+  }
+}

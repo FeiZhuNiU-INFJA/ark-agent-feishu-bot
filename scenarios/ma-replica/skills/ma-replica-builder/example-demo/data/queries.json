@@ -1,0 +1,14 @@
+[
+  {
+    "trajectory": "trajectory1.json",
+    "query": "帮我盘点工单 T-1001，客户说被重复扣费，给出处置建议。"
+  },
+  {
+    "trajectory": "trajectory2.json",
+    "query": "工单 T-1002，客户问退款政策，顺便帮我盘点这一单。"
+  },
+  {
+    "trajectory": "trajectory3.json",
+    "query": "工单 T-1003 客户要升级投诉，帮我盘点并推荐话术。"
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "trajectory1.json": {
+    "skills": [
+      "ticket_triage"
+    ],
+    "skill_docs": [
+      "ticket_triage/severity-rubric.md"
+    ],
+    "apis": [
+      "get_authed_columns",
+      "query_object"
+    ],
+    "objects": [
+      "customer",
+      "interaction_log",
+      "ticket"
+    ],
+    "other_tools": []
+  },
+  "trajectory2.json": {
+    "skills": [
+      "kb_search",
+      "ticket_triage"
+    ],
+    "skill_docs": [
+      "ticket_triage/sla-policy.md"
+    ],
+    "apis": [
+      "kb_lookup",
+      "query_object",
+      "recommend_macro"
+    ],
+    "objects": [
+      "ticket"
+    ],
+    "other_tools": []
+  },
+  "trajectory3.json": {
+    "skills": [
+      "macro_suggester"
+    ],
+    "skill_docs": [],
+    "apis": [
+      "get_authed_columns",
+      "query_object",
+      "recommend_macro"
+    ],
+    "objects": [
+      "customer",
+      "interaction_log",
+      "ticket"
+    ],
+    "other_tools": []
+  }
+}

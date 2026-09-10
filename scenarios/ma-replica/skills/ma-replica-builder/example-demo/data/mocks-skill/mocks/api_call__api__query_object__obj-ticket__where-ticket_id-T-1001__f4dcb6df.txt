@@ -1,0 +1,1 @@
+{"data": {"summary": "共 1 条", "rowList": [{"ticket_id": "T-1001", "subject": "被重复扣费两次", "status": "open", "severity": null, "created_time": "2026-08-05 09:12:00", "customer_id": "C-77", "sla_state": "running"}]}}

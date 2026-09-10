@@ -1,0 +1,1 @@
+{"data": {"hits": [{"doc": "policy/refund", "title": "退款政策", "snippet": "7 日内未使用可全额退款；已使用按比例。"}], "total": 1}}

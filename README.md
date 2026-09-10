@@ -24,7 +24,7 @@ ark-agent-feishu-bot/
 | 场景 | 一句话 | 目录 |
 | --- | --- | --- |
 | **MA × 飞书 Bot** | 把飞书对话机器人接到 MA；含客户A 四卡点（鉴权/透传/岗位/记忆）与群聊共享 Bot 两个案例。 | [scenarios/feishu-bot/](scenarios/feishu-bot/) |
-| **MA 复刻客户 Agent** | 把客户自研 Agent 的运行轨迹在 MA 上复刻重跑，对比耗时/token/cache，评估「迁移到 MA 是否更优」。 | [scenarios/ma-replica/ma-replica-builder/](scenarios/ma-replica/ma-replica-builder/) |
+| **MA 复刻客户 Agent** | 把客户自研 Agent 的运行轨迹在 MA 上复刻重跑，对比耗时/token/cache，评估「迁移到 MA 是否更优」。 | [scenarios/ma-replica/skills/ma-replica-builder/](scenarios/ma-replica/skills/ma-replica-builder/) |
 
 ## 通用件（common/）
 
@@ -48,7 +48,7 @@ pytest -q                   # 全量单测（指向 scenarios/feishu-bot/tests�
 ```
 
 场景1 的完整起步（扫码建飞书应用、`arkagent init/run`、配置项、模块速查）见 [scenarios/feishu-bot/README.md](scenarios/feishu-bot/README.md)。
-场景2 的复刻流程（轨迹抽取、mock、MA 实跑、对比报告）见 [scenarios/ma-replica/ma-replica-builder/SKILL.md](scenarios/ma-replica/ma-replica-builder/SKILL.md)。
+场景2 的复刻流程（轨迹抽取、mock、MA 实跑、对比报告）见 [scenarios/ma-replica/skills/ma-replica-builder/SKILL.md](scenarios/ma-replica/skills/ma-replica-builder/SKILL.md)。
 
 ## 参考资料
 

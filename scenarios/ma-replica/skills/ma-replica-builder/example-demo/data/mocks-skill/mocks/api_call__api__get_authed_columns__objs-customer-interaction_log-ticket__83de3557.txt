@@ -1,0 +1,1 @@
+{"data": {"summary": "3 个对象的可读列", "columns": {"ticket": ["ticket_id", "subject", "status", "severity", "created_time", "customer_id", "sla_state"], "customer": ["customer_id", "plan", "region", "signup_time", "arr_band"], "interaction_log": ["log_id", "ticket_id", "channel", "from_role", "created_time", "excerpt"]}}}

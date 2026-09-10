@@ -1,0 +1,29 @@
+{
+  "kb_search": {
+    "dir": "skills/kb_search",
+    "title": "知识库检索",
+    "docs": [],
+    "missing": [
+      "query-syntax.md",
+      "ranking-signals.md"
+    ]
+  },
+  "macro_suggester": {
+    "dir": "skills/macro_suggester",
+    "title": "话术推荐",
+    "docs": [],
+    "missing": []
+  },
+  "ticket_triage": {
+    "dir": "skills/ticket_triage",
+    "title": "工单分诊",
+    "docs": [
+      "severity-rubric.md",
+      "sla-policy.md"
+    ],
+    "missing": [
+      "escalation-paths.md",
+      "response-templates.md"
+    ]
+  }
+}
