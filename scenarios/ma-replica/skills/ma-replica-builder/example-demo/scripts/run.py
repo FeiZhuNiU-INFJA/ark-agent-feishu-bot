@@ -141,6 +141,8 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--concurrency", type=int, default=None,
                     help="同一轨迹内的并发上限（默认=repeats，即全并发）")
     ap.add_argument("--keep", action="store_true", help="跑完不删 agent/env/session")
+    ap.add_argument("--no-record-events", action="store_true",
+                    help="不落盘原始事件流（默认每次重复都写 rep<i>.events.jsonl 作复刻新轨迹原料）")
     ap.add_argument("--base-url", default=os.environ.get(
         "ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3"))
     return ap.parse_args()
@@ -203,7 +205,8 @@ async def run_one_mode(ark: ArkMin, a: argparse.Namespace, mock_mode: str) -> No
     await run_session(
         ark, agent_config=agent_cfg, queries=queries, resolve=resolve,
         runs_dir=runs_dir, run_all=a.all, keep=a.keep,
-        repeats=a.repeats, concurrency=a.concurrency)
+        repeats=a.repeats, concurrency=a.concurrency,
+        record_events=not a.no_record_events)
 
     # 对比报告（自研侧耗时用 Acme 轨迹结构）
     report_md.parent.mkdir(parents=True, exist_ok=True)

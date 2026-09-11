@@ -56,8 +56,10 @@ python example-demo/scripts/run.py --case-dir ../../ma-cases/demo --mock both --
    `resolve` 回调严格回放回传）、`agent.tool_use`（记录 bash 抢戏）、`span.model_request_end`
    （累计 `model_usage`）、`session.status_idle/terminated/error`（收尾）。
 
-跑完默认删除 session/environment/agent（`--keep` 保留用于排查）。每条轨迹每次重复的明细落
-`<case>/<mode>-mode/<轨迹stem>/rep<i>.json`，聚合（含 fail_ratio 与成功均值）落同目录 `run.json`
+跑完默认删除 session/environment/agent（`--keep` 保留用于排查）。每条轨迹每次重复的精简指标落
+`<case>/<mode>-mode/<轨迹stem>/rep<i>.json`，同次重复的**原始事件流**落同目录 `rep<i>.events.jsonl`
+（未加工的 MA 事件逐行 JSONL，可回放、可做内容级 diff 的"复刻新轨迹"原料；不需要时加 `--no-record-events` 关闭），
+聚合（含 fail_ratio 与成功均值）落同目录 `run.json`
 （files-mode 与 custom-mode 分开、不覆盖），随后每模式自动生成 `<case>/reports/comparison-<mode>.md`（见 `06`）。
 
 ## 换客户 / 排错

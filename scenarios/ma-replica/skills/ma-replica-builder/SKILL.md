@@ -42,7 +42,7 @@ message** 重跑，再和原轨迹对比**端到端耗时 / token 消耗 / cache
 │   ├── skills/<code>/SKILL.md …        # 还原出的业务 skill（两模式都用）
 │   ├── mocks-skill/…                   # 文件静态 mock 数据（仅 files 模式会挂）
 │   └── mock_system_appendix.md         # 离线取数附录（仅 files 模式拼进 system）
-├── files-mode/<traj>/       # 静态文件模式：每条轨迹一子目录，放该轨迹的 MA 实跑 run.json
+├── files-mode/<traj>/       # 静态文件模式：每条轨迹一子目录，放 rep<i>.json（精简指标）+ rep<i>.events.jsonl（原始事件流）+ run.json（聚合）
 ├── custom-mode/<traj>/      # custom tool 模式：每条轨迹一子目录（与 files-mode 分开，不覆盖）
 └── reports/                 # 对比报告 comparison-files.md / comparison-custom.md
 ```
@@ -85,7 +85,8 @@ message** 重跑，再和原轨迹对比**端到端耗时 / token 消耗 / cache
   轨迹与轨迹之间仍串行（避免相互干扰 + 便于观察）。并发上限默认=repeats，可用 `--concurrency` 收窄。
 - **失败剔除**：某次重复若 `session.error` / stop_reason 为 error / 零模型请求，判为**失败**，
   **不计入耗时/token 均值**；但会统计并展示**失败率**（逐条 + 整体）作为可靠性参考。
-- 落盘：`<mode>-mode/<traj>/rep<i>.json`（每次重复明细）+ `run.json`（该轨迹聚合，含 fail_ratio 与成功均值）。
+- 落盘：`<mode>-mode/<traj>/rep<i>.json`（每次重复精简指标）+ `rep<i>.events.jsonl`（每次重复的**原始
+  事件流**，可回放、可做内容级 diff 的"复刻新轨迹"原料；`--no-record-events` 可关）+ `run.json`（该轨迹聚合，含 fail_ratio 与成功均值）。
 - 一条命令（最终口径，cwd = skill 根 `scenarios/ma-replica/skills/ma-replica-builder/`）：
   ```bash
   python example-demo/scripts/run.py --case-dir ../../ma-cases/<case> --mock both --all --repeats 5
