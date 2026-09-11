@@ -1,0 +1,1 @@
+{"data": {"summary": "共 1 条", "rowList": [{"customer_id": "C-77", "plan": "pro", "region": "cn-east", "signup_time": "2025-03-01 10:00:00", "arr_band": "mid"}]}}

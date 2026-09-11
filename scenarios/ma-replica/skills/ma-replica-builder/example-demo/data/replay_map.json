@@ -1,0 +1,141 @@
+{
+  "current_time": {
+    "name": "current_time",
+    "args": {},
+    "result": "2026-08-06 16:22:08",
+    "is_error": false,
+    "source": "trajectory1.json"
+  },
+  "api|get_authed_columns|objs=customer,interaction_log,ticket": {
+    "name": "api_call",
+    "args": {
+      "api_code": "get_authed_columns",
+      "params": {
+        "object_code_list": [
+          "ticket",
+          "customer",
+          "interaction_log"
+        ]
+      }
+    },
+    "result": "{\"data\": {\"summary\": \"3 个对象的可读列\", \"columns\": {\"ticket\": [\"ticket_id\", \"subject\", \"status\", \"severity\", \"created_time\", \"customer_id\", \"sla_state\"], \"customer\": [\"customer_id\", \"plan\", \"region\", \"signup_time\", \"arr_band\"], \"interaction_log\": [\"log_id\", \"ticket_id\", \"channel\", \"from_role\", \"created_time\", \"excerpt\"]}}}",
+    "is_error": false,
+    "source": "trajectory1.json"
+  },
+  "api|query_object|obj=ticket|where=ticket_id=T-1001": {
+    "name": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "ticket",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1001"
+        }
+      }
+    },
+    "result": "{\"data\": {\"summary\": \"共 1 条\", \"rowList\": [{\"ticket_id\": \"T-1001\", \"subject\": \"被重复扣费两次\", \"status\": \"open\", \"severity\": null, \"created_time\": \"2026-08-05 09:12:00\", \"customer_id\": \"C-77\", \"sla_state\": \"running\"}]}}",
+    "is_error": false,
+    "source": "trajectory1.json"
+  },
+  "api|query_object|obj=customer|where=customer_id=C-77": {
+    "name": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "customer",
+        "where": {
+          "columnCode": "customer_id",
+          "value": "C-77"
+        }
+      }
+    },
+    "result": "{\"data\": {\"summary\": \"共 1 条\", \"rowList\": [{\"customer_id\": \"C-77\", \"plan\": \"pro\", \"region\": \"cn-east\", \"signup_time\": \"2025-03-01 10:00:00\", \"arr_band\": \"mid\"}]}}",
+    "is_error": false,
+    "source": "trajectory1.json"
+  },
+  "api|kb_lookup|q=4e753b4a87": {
+    "name": "api_call",
+    "args": {
+      "api_code": "kb_lookup",
+      "params": {
+        "query": "退款政策"
+      }
+    },
+    "result": "{\"data\": {\"hits\": [{\"doc\": \"policy/refund\", \"title\": \"退款政策\", \"snippet\": \"7 日内未使用可全额退款；已使用按比例。\"}], \"total\": 1}}",
+    "is_error": false,
+    "source": "trajectory2.json"
+  },
+  "api|query_object|obj=ticket|where=ticket_id=T-1002": {
+    "name": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "ticket",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1002"
+        }
+      }
+    },
+    "result": "{\"data\": {\"summary\": \"共 1 条\", \"rowList\": [{\"ticket_id\": \"T-1002\", \"subject\": \"咨询退款政策\", \"status\": \"pending\", \"created_time\": \"2026-08-06 11:30:00\", \"customer_id\": \"C-88\", \"sla_state\": \"paused\"}]}}",
+    "is_error": false,
+    "source": "trajectory2.json"
+  },
+  "api|recommend_macro|tag=refund": {
+    "name": "api_call",
+    "args": {
+      "api_code": "recommend_macro",
+      "params": {
+        "recommend_tag": "refund"
+      }
+    },
+    "result": "{\"data\": {\"macros\": [\"您好，关于退款：7 日内未使用可全额退款，已使用部分按比例结算……\"]}}",
+    "is_error": false,
+    "source": "trajectory2.json"
+  },
+  "api|query_object|obj=ticket|where=ticket_id=T-1003": {
+    "name": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "ticket",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1003"
+        }
+      }
+    },
+    "result": "{\"data\": {\"summary\": \"共 1 条\", \"rowList\": [{\"ticket_id\": \"T-1003\", \"subject\": \"要求升级投诉\", \"status\": \"open\", \"severity\": \"P1\", \"created_time\": \"2026-08-04 14:00:00\", \"customer_id\": \"C-91\", \"sla_state\": \"breached\"}]}}",
+    "is_error": false,
+    "source": "trajectory3.json"
+  },
+  "api|query_object|obj=interaction_log|where=ticket_id=T-1003": {
+    "name": "api_call",
+    "args": {
+      "api_code": "query_object",
+      "params": {
+        "object_code": "interaction_log",
+        "where": {
+          "columnCode": "ticket_id",
+          "value": "T-1003"
+        }
+      }
+    },
+    "result": "[tool_error] {\"code\": \"REPLAY_MISS\", \"message\": \"interaction_log 查询在录制时超时，无数据\"}",
+    "is_error": true,
+    "source": "trajectory3.json"
+  },
+  "api|recommend_macro|tag=billing": {
+    "name": "api_call",
+    "args": {
+      "api_code": "recommend_macro",
+      "params": {
+        "recommend_tag": "billing"
+      }
+    },
+    "result": "{\"data\": {\"macros\": [\"您好，重复扣费问题我们已核实，将于 3 个工作日内原路退回……\"]}}",
+    "is_error": false,
+    "source": "trajectory3.json"
+  }
+}
